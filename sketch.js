@@ -1,6 +1,5 @@
 let a = 0;
 let side = "x";
-let currentBox;
 
 let boxSize = {
     w: 200,
@@ -8,11 +7,17 @@ let boxSize = {
     d: 200
 }
 
+let currentBox = 0;
+let stackSize = 10;
+let stack = [];
+
 class Box {
     constructor(w, h, d) {
         this.width = w;
         this.height = h;
         this.depth = d;
+        this.x = 0;
+        this.z = 0;
     }
 
     draw() {
@@ -24,11 +29,17 @@ function setup() {
     createCanvas(600, 600, WEBGL);
     ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 500);
 
-    currentBox = new Box(boxSize.w, boxSize.h, boxSize.d);
+    for (let i = 0; i < stackSize; i++) {
+        stack[i] = new Box(boxSize.w, boxSize.h, boxSize.d);
+    }
 }
 
 function mousePressed() {
     side = (side === "x") ? "z" : "x";
+    currentBox--;
+    if(currentBox < 0) {
+        currentBox = stackSize-1;
+    }
 }
 
 function draw() {
@@ -38,14 +49,22 @@ function draw() {
     background(50);
     normalMaterial();
 
-    if(side === "x") {
-        translate(cos(a)*boxSize.w, 0, 0);
-    } else {
-        translate(0, 0, cos(a)*boxSize.d);
+    for (let i = 0; i < stackSize; i++) {
+        translate(0, -boxSize.h, 0);
+
+        push();
+        if (i === currentBox) {
+            if (side === "x") {
+                translate(cos(a) * boxSize.w, 0, 0);
+            } else {
+                translate(0, 0, cos(a) * boxSize.d);
+            }
+        }
+        stack[i].draw();
+
+        pop();
     }
 
-    currentBox.draw();
-
-    a+=0.06;
+    a += 0.06;
 
 }
