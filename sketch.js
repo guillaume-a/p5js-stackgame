@@ -68,7 +68,7 @@ function mousePressed() {
 }
 
 function draw() {
-    rotateX(-QUARTER_PI);
+    rotateX(-HALF_PI/3);
     rotateY(atan(1));
 
     background(50);
