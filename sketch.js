@@ -1,23 +1,34 @@
 let a = 0;
-let height = 50;
+let boxWidth = 200;
+let boxHeight = 40;
+let boxDepth = 200;
+
+let side = "x";
 
 function setup() {
     createCanvas(600, 600, WEBGL);
     ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 500);
+}
 
+function mousePressed() {
+    side = (side === "x") ? "z" : "x";
 }
 
 function draw() {
-
     rotateX(-QUARTER_PI);
     rotateY(atan(1));
 
     background(50);
     normalMaterial();
 
-    translate(cos(a)*70, 0, 0);
-    box(50);
+    if(side === "x") {
+        translate(cos(a)*boxWidth, 0, 0);
+    } else {
+        translate(0, 0, cos(a)*boxDepth);
+    }
 
-    a+=0.1;
+    box(boxWidth, boxHeight, boxDepth);
+
+    a+=0.06;
 
 }
