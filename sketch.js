@@ -1,6 +1,7 @@
 let wave = 0;
 let waveSpeed = 0.05;
 let side = "x";
+let score = 0;
 
 let boxSize = {
     w: 200,
@@ -10,7 +11,7 @@ let boxSize = {
 
 let currentIndex = 0;
 let lastIndex = 1;
-let stackSize = 6;
+let stackSize = 16;
 let stack = [];
 
 let cameraHeight = 0;
@@ -63,6 +64,7 @@ function mousePressed() {
     stack[currentIndex].oz = 0;
 
     wave=0;
+    score++;
 
     cameraHeight+=boxSize.h;
     ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, -500, 500);
