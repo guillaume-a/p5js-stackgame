@@ -53,12 +53,9 @@ function setup() {
 }
 
 function mousePressed() {
-
     if(state !== IN_GAME) {
         return;
     }
-
-    //side = (side === "x") ? "z" : "x";
 
     //merge position with offset
     stack[currentIndex].x = stack[currentIndex].x + stack[currentIndex].ox;
@@ -67,27 +64,45 @@ function mousePressed() {
     stack[currentIndex].oz = 0;
 
     //calculate cutsize
-    cutSize = stack[currentIndex].x + - stack[prevIndex].x;
+    if(side == "x") {
+        cutSize = stack[currentIndex].x - stack[prevIndex].x;
+    }
+    else {
+        cutSize = stack[currentIndex].z - stack[prevIndex].z;
+    }
 
     //check if current shot if a perfect one
     let perfect = abs(cutSize) < threshold;
 
-    console.log(cutSize, perfect);
-
     if(perfect) {
         console.log("PERFECT !!");
         cutSize = 0;
-        stack[currentIndex].x = stack[prevIndex].x;
+
+        if(side == "x") {
+            stack[currentIndex].x = stack[prevIndex].x;
+        }
+        else {
+            stack[currentIndex].z = stack[prevIndex].z;
+        }
     }
 
-    if(stack[currentIndex].width - abs(cutSize) < 0) {
+    if(
+        side == "x" && stack[currentIndex].width - abs(cutSize) < 0 ||
+        side == "z" && stack[currentIndex].depth - abs(cutSize) < 0
+    ) {
         state = GAME_OVER;
         console.log("GAME OVER :(");
         return;
     }
 
-    stack[currentIndex].width -= abs(cutSize);
-    stack[currentIndex].x -= cutSize / 2;
+    if(side == "x") {
+        stack[currentIndex].width -= abs(cutSize);
+        stack[currentIndex].x -= cutSize / 2;
+    }
+    else {
+        stack[currentIndex].depth -= abs(cutSize);
+        stack[currentIndex].z -= cutSize / 2;
+    }
 
     prevIndex = currentIndex;
     currentIndex--;
@@ -106,8 +121,8 @@ function mousePressed() {
 
     wave=0;
     score++;
-
-    cameraHeight+=boxSize.h;
+    side = (side === "x") ? "z" : "x";
+    cameraHeight += boxSize.h;
     ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, -500, 500);
 }
 
