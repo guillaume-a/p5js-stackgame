@@ -67,12 +67,7 @@ function mousePressed() {
     stack[currentIndex].oz = 0;
 
     //calculate cutsize
-    if(side == SIDE_X) {
-        cutSize = stack[currentIndex].x - stack[prevIndex].x;
-    }
-    else {
-        cutSize = stack[currentIndex].z - stack[prevIndex].z;
-    }
+    cutSize = stack[currentIndex][side] - stack[prevIndex][side];
 
     //check if current shot if a perfect one
     let perfect = abs(cutSize) < threshold;
@@ -80,13 +75,7 @@ function mousePressed() {
     if(perfect) {
         console.log("PERFECT !!");
         cutSize = 0;
-
-        if(side == SIDE_X) {
-            stack[currentIndex].x = stack[prevIndex].x;
-        }
-        else {
-            stack[currentIndex].z = stack[prevIndex].z;
-        }
+        stack[currentIndex][side] = stack[prevIndex][side];
     }
 
     if(
