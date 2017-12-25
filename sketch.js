@@ -35,7 +35,7 @@ class Box {
 
 function setup() {
     createCanvas(600, 600, WEBGL);
-    ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, 0, 500);
+    ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, -500, 500);
 
     let currentBox;
 
@@ -63,9 +63,9 @@ function mousePressed() {
     stack[currentIndex].oz = 0;
 
     wave=0;
-    
+
     cameraHeight+=boxSize.h;
-    ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, 0, 500);
+    ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, -500, 500);
 }
 
 function draw() {
