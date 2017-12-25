@@ -1,4 +1,5 @@
-let a = 0;
+let wave = 0;
+let waveSpeed = 0.05;
 let side = "x";
 
 let boxSize = {
@@ -11,7 +12,8 @@ let currentIndex = 0;
 let lastIndex = 1;
 let stackSize = 6;
 let stack = [];
-let stackHeight = 0;
+
+let cameraHeight = 0;
 
 class Box {
     constructor(w, h, d) {
@@ -33,7 +35,7 @@ class Box {
 
 function setup() {
     createCanvas(600, 600, WEBGL);
-    ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 500);
+    ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, 0, 500);
 
     let currentBox;
 
@@ -55,16 +57,15 @@ function mousePressed() {
     }
 
     stack[currentIndex].x = stack[prevIndex].x + stack[prevIndex].ox;
-    stack[currentIndex].y = boxSize.h;
+    stack[currentIndex].y = stack[prevIndex].y + stack[prevIndex].height;
     stack[currentIndex].z = stack[prevIndex].z + stack[prevIndex].oz;
     stack[currentIndex].ox = 0;
     stack[currentIndex].oz = 0;
 
-    for (let i = 0; i < stackSize; i++) {
-        stack[i].y -= boxSize.h;
-    }
-
-    a=0;
+    wave=0;
+    
+    cameraHeight+=boxSize.h;
+    ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, 0, 500);
 }
 
 function draw() {
@@ -79,9 +80,9 @@ function draw() {
 
         if (i === currentIndex) {
             if (side === "x") {
-                stack[i].ox = cos(a) * stack[i].width;
+                stack[i].ox = cos(wave) * stack[i].width;
             } else {
-                stack[i].oz = cos(a) * stack[i].depth;
+                stack[i].oz = cos(wave) * stack[i].depth;
             }
         }
 
@@ -89,5 +90,5 @@ function draw() {
         pop();
     }
 
-    a += 0.05;
+    wave += waveSpeed;
 }
