@@ -1,12 +1,15 @@
 const IN_GAME = 1;
 const GAME_OVER = 2;
 
+const SIDE_X = "x";
+const SIDE_Z = "z";
+
 let state = IN_GAME;
 let wave = 0;
 let waveSpeed = 0.05;
-let side = "x";
+let side = SIDE_X;
 let score = 0;
-let threshold = 7;
+let threshold = 5;
 
 let boxSize = {
     w: 200,
@@ -18,7 +21,6 @@ let currentIndex = 0;
 let prevIndex = 1;
 let stackSize = 16;
 let stack = [];
-
 let cameraHeight = 0;
 
 class Box {
@@ -39,16 +41,17 @@ class Box {
     }
 }
 
+function moveCamera() {
+    ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, -500, 500);
+}
+
 function setup() {
     createCanvas(600, 600, WEBGL);
-    ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, -500, 500);
-
-    let currentBox;
+    moveCamera();
 
     for (let i = stackSize-1; i >= 0; i--) {
-        currentBox = new Box(boxSize.w, boxSize.h, boxSize.d);
-        currentBox.y = -i * boxSize.h;
-        stack[i] = currentBox;
+        stack[i] = new Box(boxSize.w, boxSize.h, boxSize.d);
+        stack[i].y = -i * boxSize.h;
     }
 }
 
@@ -64,7 +67,7 @@ function mousePressed() {
     stack[currentIndex].oz = 0;
 
     //calculate cutsize
-    if(side == "x") {
+    if(side == SIDE_X) {
         cutSize = stack[currentIndex].x - stack[prevIndex].x;
     }
     else {
@@ -78,7 +81,7 @@ function mousePressed() {
         console.log("PERFECT !!");
         cutSize = 0;
 
-        if(side == "x") {
+        if(side == SIDE_X) {
             stack[currentIndex].x = stack[prevIndex].x;
         }
         else {
@@ -87,15 +90,15 @@ function mousePressed() {
     }
 
     if(
-        side == "x" && stack[currentIndex].width - abs(cutSize) < 0 ||
-        side == "z" && stack[currentIndex].depth - abs(cutSize) < 0
+        side === SIDE_X && stack[currentIndex].width - abs(cutSize) < 0 ||
+        side === SIDE_Z && stack[currentIndex].depth - abs(cutSize) < 0
     ) {
         state = GAME_OVER;
         console.log("GAME OVER :(");
         return;
     }
 
-    if(side == "x") {
+    if(side === SIDE_X) {
         stack[currentIndex].width -= abs(cutSize);
         stack[currentIndex].x -= cutSize / 2;
     }
@@ -121,9 +124,9 @@ function mousePressed() {
 
     wave=0;
     score++;
-    side = (side === "x") ? "z" : "x";
+    side = (side === SIDE_X) ? SIDE_Z : SIDE_X;
     cameraHeight += boxSize.h;
-    ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, -500, 500);
+    moveCamera();
 }
 
 function draw() {
@@ -141,10 +144,10 @@ function draw() {
         push();
 
         if (i === currentIndex) {
-            if (side === "x") {
-                stack[i].ox = cos(wave) * (stack[i].width + 20);
+            if (side === SIDE_X) {
+                stack[i].ox = cos(wave) * (stack[i].width + 15);
             } else {
-                stack[i].oz = cos(wave) * (stack[i].depth + 20);
+                stack[i].oz = cos(wave) * (stack[i].depth + 15);
             }
         }
 
