@@ -1,7 +1,12 @@
+const IN_GAME = 1;
+const GAME_OVER = 2;
+
+let state = IN_GAME;
 let wave = 0;
 let waveSpeed = 0.05;
 let side = "x";
 let score = 0;
+let threshold = 7;
 
 let boxSize = {
     w: 200,
@@ -10,7 +15,7 @@ let boxSize = {
 }
 
 let currentIndex = 0;
-let lastIndex = 1;
+let prevIndex = 1;
 let stackSize = 16;
 let stack = [];
 
@@ -48,7 +53,41 @@ function setup() {
 }
 
 function mousePressed() {
-    side = (side === "x") ? "z" : "x";
+
+    if(state !== IN_GAME) {
+        return;
+    }
+
+    //side = (side === "x") ? "z" : "x";
+
+    //merge position with offset
+    stack[currentIndex].x = stack[currentIndex].x + stack[currentIndex].ox;
+    stack[currentIndex].z = stack[currentIndex].z + stack[currentIndex].oz;
+    stack[currentIndex].ox = 0;
+    stack[currentIndex].oz = 0;
+
+    //calculate cutsize
+    cutSize = stack[currentIndex].x + - stack[prevIndex].x;
+
+    //check if current shot if a perfect one
+    let perfect = abs(cutSize) < threshold;
+
+    console.log(cutSize, perfect);
+
+    if(perfect) {
+        console.log("PERFECT !!");
+        cutSize = 0;
+        stack[currentIndex].x = stack[prevIndex].x;
+    }
+
+    if(stack[currentIndex].width - abs(cutSize) < 0) {
+        state = GAME_OVER;
+        console.log("GAME OVER :(");
+        return;
+    }
+
+    stack[currentIndex].width -= abs(cutSize);
+    stack[currentIndex].x -= cutSize / 2;
 
     prevIndex = currentIndex;
     currentIndex--;
@@ -62,6 +101,8 @@ function mousePressed() {
     stack[currentIndex].z = stack[prevIndex].z + stack[prevIndex].oz;
     stack[currentIndex].ox = 0;
     stack[currentIndex].oz = 0;
+    stack[currentIndex].width = stack[prevIndex].width;
+    stack[currentIndex].depth = stack[prevIndex].depth;
 
     wave=0;
     score++;
@@ -71,6 +112,10 @@ function mousePressed() {
 }
 
 function draw() {
+    if(state !== IN_GAME) {
+        return;
+    }
+
     rotateX(-HALF_PI/3);
     rotateY(atan(1));
 
@@ -82,9 +127,9 @@ function draw() {
 
         if (i === currentIndex) {
             if (side === "x") {
-                stack[i].ox = cos(wave) * stack[i].width;
+                stack[i].ox = cos(wave) * (stack[i].width + 20);
             } else {
-                stack[i].oz = cos(wave) * stack[i].depth;
+                stack[i].oz = cos(wave) * (stack[i].depth + 20);
             }
         }
 
