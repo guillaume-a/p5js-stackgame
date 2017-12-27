@@ -1,5 +1,6 @@
 const IN_GAME = 1;
 const GAME_OVER = 2;
+const MOVE_BOXES = 3;
 
 const SIDE_X = "x";
 const SIDE_Z = "z";
@@ -21,7 +22,6 @@ let currentIndex = 0;
 let prevIndex = 1;
 let stackSize = 16;
 let stack = [];
-let cameraHeight = 0;
 
 class Box {
     constructor(w, h, d) {
@@ -41,13 +41,9 @@ class Box {
     }
 }
 
-function moveCamera() {
-    ortho(-width / 2, width / 2, (height-cameraHeight) / 2, (-height-cameraHeight) / 2, -500, 500);
-}
-
 function setup() {
     createCanvas(600, 600, WEBGL);
-    moveCamera();
+    ortho(-width / 2, width / 2, height / 2, -height / 2, -500, 500);
 
     for (let i = stackSize-1; i >= 0; i--) {
         stack[i] = new Box(boxSize.w, boxSize.h, boxSize.d);
@@ -111,15 +107,14 @@ function mousePressed() {
     stack[currentIndex].width = stack[prevIndex].width;
     stack[currentIndex].depth = stack[prevIndex].depth;
 
-    wave=0;
     score++;
     side = (side === SIDE_X) ? SIDE_Z : SIDE_X;
-    cameraHeight += boxSize.h;
-    moveCamera();
+
+    state = MOVE_BOXES;
 }
 
 function draw() {
-    if(state !== IN_GAME) {
+    if(state === GAME_OVER) {
         return;
     }
 
@@ -131,18 +126,28 @@ function draw() {
 
     for (let i = 0; i < stackSize; i++) {
         push();
-
-        if (i === currentIndex) {
-            if (side === SIDE_X) {
-                stack[i].ox = cos(wave) * (stack[i].width + 15);
-            } else {
-                stack[i].oz = cos(wave) * (stack[i].depth + 15);
+        if(state === IN_GAME) {
+            if (i === currentIndex) {
+                if (side === SIDE_X) {
+                    stack[i].ox = cos(wave) * (stack[i].width + 15);
+                } else {
+                    stack[i].oz = cos(wave) * (stack[i].depth + 15);
+                }
             }
+        }
+        else if(state === MOVE_BOXES) {
+            stack[i].y += boxSize.h;
         }
 
         stack[i].draw();
         pop();
     }
 
-    wave += waveSpeed;
+    if(state === IN_GAME) {
+        wave=0;
+        wave += waveSpeed;
+    }
+    else if(state === MOVE_BOXES) {
+        state = IN_GAME;
+    }
 }
