@@ -90,7 +90,7 @@ function setup() {
         stack[i].y = -i * boxSize.h;
     }
 
-    state = IN_GAME;
+    newGame();
 }
 
 function mousePressed() {
@@ -112,6 +112,7 @@ function mousePressed() {
 
     if(perfect) {
         console.log("PERFECT !!");
+        score++;
         cutSize = 0;
         stack[currentIndex][side] = stack[prevIndex][side];
     }
@@ -121,7 +122,7 @@ function mousePressed() {
         side === SIDE_Z && stack[currentIndex].depth - abs(cutSize) < 0
     ) {
         state = GAME_OVER;
-        console.log("GAME OVER :(");
+        gameOver();
         return;
     }
 
@@ -163,6 +164,8 @@ function draw() {
         return;
     }
 
+    updateGUI();
+
     rotateX(-HALF_PI/3);
     rotateY(atan(1));
 
@@ -194,4 +197,20 @@ function draw() {
     else if(state === MOVE_BOXES) {
         tween.step();
     }
+}
+
+function newGame() {
+    document.getElementById("gameover").style.display = "none";
+    score = 0;
+
+    state = IN_GAME;
+}
+
+function gameOver() {
+    document.getElementById("score").innerText = "Final Score : " + score.toString();
+    document.getElementById("gameover").style.display = "block";
+}
+
+function updateGUI() {
+    document.getElementById("score").innerText = "Score : " + score.toString();
 }
