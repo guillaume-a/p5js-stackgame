@@ -21,9 +21,9 @@ class Tween {
 
         if(this.delta == 0) {
             this.callback();
-        } else if(this.delta < this.threshold) {
+        } else if(this.delta <= this.threshold) {
             this.current = this.end;
-            this.delta = 0;
+            this.delta = diff;
         } else {
             this.current += this.delta;
         }
