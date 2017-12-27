@@ -1,3 +1,54 @@
+
+class Tween {
+
+    constructor(start, end, ease, threshold, callback) {
+        this.start = start;
+        this.end = end;
+        this.ease = ease;
+        this.threshold = threshold;
+        this.callback = callback;
+
+        this.reset();
+    }
+
+    reset() {
+        this.delta = 0;
+        this.current = this.start;
+    }
+
+    step() {
+        let diff = this.end - this.current;
+        this.delta = Math.floor(diff * this.ease);
+
+        if(this.delta == 0) {
+            this.callback();
+        } else if(this.delta < this.threshold) {
+            this.current += diff;
+            this.delta = 0;
+        } else {
+            this.current += this.delta;
+        }
+    }
+}
+
+class Box {
+    constructor(w, h, d) {
+        this.width = w;
+        this.height = h;
+        this.depth = d;
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.ox = 0;
+        this.oz = 0;
+    }
+
+    draw() {
+        translate(this.x + this.ox, this.y, this.z + this.oz);
+        box(this.width, this.height, this.depth);
+    }
+}
+
 const IN_GAME = 1;
 const GAME_OVER = 2;
 const MOVE_BOXES = 3;
@@ -23,32 +74,23 @@ let prevIndex = 1;
 let stackSize = 16;
 let stack = [];
 
-class Box {
-    constructor(w, h, d) {
-        this.width = w;
-        this.height = h;
-        this.depth = d;
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.ox = 0;
-        this.oz = 0;
-    }
-
-    draw() {
-        translate(this.x + this.ox, this.y, this.z + this.oz);
-        box(this.width, this.height, this.depth);
-    }
-}
+let tween;
 
 function setup() {
     createCanvas(600, 600, WEBGL);
     ortho(-width / 2, width / 2, height / 2, -height / 2, -500, 500);
 
+    tween = new Tween(0, boxSize.h, 0.3, 1, () => {
+        wave = 0;
+        state = IN_GAME;
+    });
+
     for (let i = stackSize-1; i >= 0; i--) {
         stack[i] = new Box(boxSize.w, boxSize.h, boxSize.d);
         stack[i].y = -i * boxSize.h;
     }
+
+    state = IN_GAME;
 }
 
 function mousePressed() {
@@ -110,6 +152,7 @@ function mousePressed() {
     score++;
     side = (side === SIDE_X) ? SIDE_Z : SIDE_X;
 
+    tween.reset();
     state = MOVE_BOXES;
 }
 
@@ -136,7 +179,7 @@ function draw() {
             }
         }
         else if(state === MOVE_BOXES) {
-            stack[i].y += boxSize.h;
+            stack[i].y -= tween.delta;
         }
 
         stack[i].draw();
@@ -144,10 +187,9 @@ function draw() {
     }
 
     if(state === IN_GAME) {
-        wave=0;
         wave += waveSpeed;
     }
     else if(state === MOVE_BOXES) {
-        state = IN_GAME;
+        tween.step();
     }
 }
