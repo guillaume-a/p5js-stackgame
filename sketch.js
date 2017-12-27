@@ -1,4 +1,3 @@
-
 class Tween {
 
     constructor(start, end, ease, threshold, callback) {
@@ -81,6 +80,7 @@ function setup() {
     ortho(-width / 2, width / 2, height / 2, -height / 2, -500, 500);
 
     tween = new Tween(0, boxSize.h, 0.3, 1, () => {
+        cloneBox();
         wave = 0;
         state = IN_GAME;
     });
@@ -134,6 +134,14 @@ function mousePressed() {
         stack[currentIndex].z -= cutSize / 2;
     }
 
+    score++;
+    side = (side === SIDE_X) ? SIDE_Z : SIDE_X;
+
+    tween.reset();
+    state = MOVE_BOXES;
+}
+
+function cloneBox() {
     prevIndex = currentIndex;
     currentIndex--;
 
@@ -148,12 +156,6 @@ function mousePressed() {
     stack[currentIndex].oz = 0;
     stack[currentIndex].width = stack[prevIndex].width;
     stack[currentIndex].depth = stack[prevIndex].depth;
-
-    score++;
-    side = (side === SIDE_X) ? SIDE_Z : SIDE_X;
-
-    tween.reset();
-    state = MOVE_BOXES;
 }
 
 function draw() {
