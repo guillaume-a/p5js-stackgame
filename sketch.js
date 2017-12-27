@@ -35,6 +35,10 @@ class Box {
         this.width = w;
         this.height = h;
         this.depth = d;
+        this.reset();
+    }
+
+    reset() {
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -200,8 +204,20 @@ function draw() {
 }
 
 function newGame() {
+    for (let i = stackSize-1; i >= 0; i--) {
+        stack[i].width = boxSize.w;
+        stack[i].height = boxSize.h;
+        stack[i].depth = boxSize.d;
+        stack[i].reset();
+        stack[i].y = -i * boxSize.h;
+    }
+
     document.getElementById("gameover").style.display = "none";
+
+    side = SIDE_X;
     score = 0;
+    currentIndex = 0;
+    prevIndex = 1;
 
     state = IN_GAME;
 }
