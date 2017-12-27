@@ -79,7 +79,33 @@ let stack = [];
 
 let tween;
 
+let bgColors = [];
+
+function setBackgroundColor() {
+    let pointsPerRange = 20;
+    let pointsFullRange = (bgColors.length-1) * pointsPerRange;
+
+    let colorIndex = Math.floor((score / pointsPerRange) % bgColors.length);
+
+    let moduloScore = score % pointsPerRange;
+
+    colorNextIndex = colorIndex + 1;
+    if(colorNextIndex === bgColors.length) {
+        colorNextIndex = 0;
+    }
+
+    background(lerpColor(bgColors[colorIndex], bgColors[colorNextIndex], moduloScore/pointsPerRange));
+}
+
 function setup() {
+    bgColors = [
+       color('#E4E8C5'),
+       color('#D7E8A0'),
+       color('#C7CFC7'),
+       color('#A1A3B7'),
+       color('#7B9FB7'),
+   ];
+
     createCanvas(600, 600, WEBGL);
     ortho(-width / 2, width / 2, height / 2, -height / 2, -500, 500);
 
@@ -173,7 +199,8 @@ function draw() {
     rotateX(-HALF_PI/3);
     rotateY(atan(1));
 
-    background(50);
+    setBackgroundColor();
+
     normalMaterial();
 
     for (let i = 0; i < stackSize; i++) {
